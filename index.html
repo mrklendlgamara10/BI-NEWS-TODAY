@@ -5,78 +5,140 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BI Media Monitoring Dashboard</title>
     <style>
+        :root {
+            --primary-color: #003366;
+            --secondary-color: #0066cc;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #1a1a1a;
+            --text-muted: #666666;
+            --border-color: #e1e8ed;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            background-color: #f4f6f9;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
         }
 
         header {
-            background-color: #003366;
+            background-color: var(--primary-color);
             color: white;
-            padding: 25px 20px;
-            text-align: center;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.15);
         }
 
         header h1 {
             margin: 0;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 600;
         }
 
         .container {
-            max-width: 600px;
-            margin: 60px auto;
+            max-width: 900px;
+            margin: 30px auto;
             padding: 0 20px;
-            width: 100%;
-            box-sizing: border-box;
         }
 
-        .main-card {
-            background: white;
-            padding: 40px 30px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border: 1px solid #e1e8ed;
-        }
-
-        .main-card h2 {
-            margin-top: 0;
-            color: #003366;
-            font-size: 18px;
-            margin-bottom: 12px;
-        }
-
-        .main-card p {
-            color: #555;
-            font-size: 14px;
-            margin-bottom: 28px;
-            line-height: 1.5;
-        }
-
-        .action-btn {
-            background-color: #0066cc;
-            color: white;
-            padding: 16px 32px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
+        .controls {
+            background-color: var(--card-bg);
+            padding: 15px 20px;
             border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            box-shadow: 0 3px 6px rgba(0,102,204,0.3);
-            transition: background 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .action-btn:hover {
+        .refresh-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .refresh-btn:hover {
             background-color: #004999;
+        }
+
+        .news-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .news-card {
+            background-color: var(--card-bg);
+            border-left: 5px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            border-top: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .news-title {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            line-height: 1.4;
+        }
+
+        .news-title a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .news-title a:hover {
+            text-decoration: underline;
+        }
+
+        .news-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .news-summary {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333333;
+            margin: 0 0 15px 0;
+        }
+
+        .news-link-btn {
+            display: inline-block;
+            color: var(--secondary-color);
+            font-weight: bold;
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        .news-link-btn:hover {
+            text-decoration: underline;
+        }
+
+        .status-msg {
+            text-align: center;
+            padding: 40px;
+            font-size: 15px;
+            color: var(--text-muted);
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
     </style>
 </head>
@@ -84,18 +146,126 @@
 
     <header>
         <h1>🏛️ Bureau of Immigration - Media Monitoring Dashboard</h1>
+        <span id="last-updated" style="font-size: 12px; opacity: 0.9;"></span>
     </header>
 
     <div class="container">
-        <div class="main-card">
-            <h2>Real-Time PH Media Aggregator</h2>
-            <p>I-click ang button sa ibaba para buksan ang live news monitoring para sa Bureau of Immigration mula sa lahat ng TV networks at broadsheets (GMA, ABS-CBN, Inquirer, Philstar, TV5, etc.):</p>
-            
-            <a href="https://news.google.com/search?q=%22Bureau%20of%20Immigration%22%20OR%20%22BI%20NAIA%22%20OR%20%22Immigration%20Philippines%22&hl=en-PH&gl=PH&ceid=PH%3Aen" target="_blank" class="action-btn">
-                🔍 OPEN LIVE BI NEWS FEED
-            </a>
+        <div class="controls">
+            <span><strong>Source:</strong> Major PH TV Networks & Broadsheets</span>
+            <button class="refresh-btn" onclick="fetchNewsFeed()">🔄 Refresh Feed</button>
+        </div>
+
+        <div id="news-container" class="news-list">
+            <div class="status-msg">Kumukuha ng mga pinakabagong balita... Mangyaring maghintay...</div>
         </div>
     </div>
+
+    <script>
+        async function fetchNewsFeed() {
+            const container = document.getElementById('news-container');
+            container.innerHTML = '<div class="status-msg">Ina-update ang balita mula sa GMA, ABS-CBN, Inquirer, Philstar, atbp...</div>';
+
+            const query = encodeURIComponent('"Bureau of Immigration" OR "BI NAIA" OR "Immigration Philippines"');
+            const targetRss = `https://news.google.com/rss/search?q=${query}&hl=en-PH&gl=PH&ceid=PH:en`;
+            
+            // Reliable Serverless Parsing Endpoint
+            const apiUrl = `https://api.factmaven.com/xml-to-json/?xml=${encodeURIComponent(targetRss)}`;
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error("Unable to fetch feed");
+                
+                const data = await response.json();
+                const items = data?.rss?.channel?.item;
+
+                if (!items || items.length === 0) {
+                    container.innerHTML = '<div class="status-msg">Walang nakuhang bagong balita sa kasalukuyan. Pindutin ang Refresh Feed.</div>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                document.getElementById('last-updated').textContent = 'Last Updated: ' + new Date().toLocaleTimeString();
+
+                // Process list of news items
+                const newsList = Array.isArray(items) ? items : [items];
+
+                newsList.forEach((item, index) => {
+                    const title = item.title || "Walang Pamagat";
+                    const link = item.link || "#";
+                    const pubDateRaw = item.pubDate || "";
+                    const pubDate = pubDateRaw ? new Date(pubDateRaw).toLocaleString() : "Recently";
+                    
+                    let rawDesc = item.description || "";
+                    // Clean HTML tags from summary text
+                    let cleanSummary = rawDesc.replace(/<[^>]*>?/gm, '').trim();
+                    if (cleanSummary.length > 220) {
+                        cleanSummary = cleanSummary.substring(0, 220) + '...';
+                    }
+
+                    const source = item.source?.['#text'] || item.source || "PH Media Outlet";
+
+                    const card = document.createElement('div');
+                    card.className = 'news-card';
+                    card.innerHTML = `
+                        <h3 class="news-title">${index + 1}. <a href="${link}" target="_blank" rel="noopener noreferrer">${title}</a></h3>
+                        <div class="news-meta">
+                            <span>📅 ${pubDate}</span>
+                            <span>📰 Source: <strong>${source}</strong></span>
+                        </div>
+                        <p class="news-summary">${cleanSummary || 'I-click ang link sa ibaba para mabasa ang buong ulat sa opisyal na website.'}</p>
+                        <a href="${link}" target="_blank" rel="noopener noreferrer" class="news-link-btn">Basahin ang buong balita sa source site &raquo;</a>
+                    `;
+                    container.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error(err);
+                // Fallback rendering structure using Google Feed API
+                fetchBackupFeed();
+            }
+        }
+
+        async function fetchBackupFeed() {
+            const container = document.getElementById('news-container');
+            const query = encodeURIComponent('"Bureau of Immigration" OR "BI NAIA"');
+            const targetRss = `https://news.google.com/rss/search?q=${query}&hl=en-PH&gl=PH&ceid=PH:en`;
+            
+            try {
+                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(targetRss)}`);
+                const data = await res.json();
+                
+                if (data.status === 'ok' && data.items.length > 0) {
+                    container.innerHTML = '';
+                    document.getElementById('last-updated').textContent = 'Last Updated: ' + new Date().toLocaleTimeString();
+
+                    data.items.forEach((item, index) => {
+                        const pubDate = item.pubDate ? new Date(item.pubDate).toLocaleString() : "";
+                        let cleanDesc = item.description.replace(/<[^>]*>?/gm, '').trim();
+                        if (cleanDesc.length > 200) cleanDesc = cleanDesc.substring(0, 200) + '...';
+
+                        const card = document.createElement('div');
+                        card.className = 'news-card';
+                        card.innerHTML = `
+                            <h3 class="news-title">${index + 1}. <a href="${item.link}" target="_blank">${item.title}</a></h3>
+                            <div class="news-meta">
+                                <span>📅 ${pubDate}</span>
+                                <span>📰 Source: <strong>${item.author || 'News Outlet'}</strong></span>
+                            </div>
+                            <p class="news-summary">${cleanDesc}</p>
+                            <a href="${item.link}" target="_blank" class="news-link-btn">Basahin ang buong balita &raquo;</a>
+                        `;
+                        container.appendChild(card);
+                    });
+                } else {
+                    throw new Error("Backup failed");
+                }
+            } catch (e) {
+                container.innerHTML = '<div class="status-msg">Hindi maikonekta sa news server. Paki-pindot ang "Refresh Feed" button para sumubok muli.</div>';
+            }
+        }
+
+        window.onload = fetchNewsFeed;
+    </script>
 
 </body>
 </html>
