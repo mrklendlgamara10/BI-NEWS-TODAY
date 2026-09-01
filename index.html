@@ -12,7 +12,6 @@
             --card-bg: #ffffff;
             --text-color: #2d3748;
             --text-muted: #718096;
-            --border-color: #e2e8f0;
         }
 
         body {
@@ -33,10 +32,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        header h1 {
-            margin: 0;
-            font-size: 22px;
-        }
+        header h1 { margin: 0; font-size: 22px; }
 
         .container {
             max-width: 1000px;
@@ -64,12 +60,9 @@
             font-weight: bold;
             border-radius: 5px;
             cursor: pointer;
-            transition: background 0.2s ease;
         }
 
-        .refresh-btn:hover {
-            background-color: #1c4ed8;
-        }
+        .refresh-btn:hover { background-color: #1c4ed8; }
 
         .news-grid {
             display: grid;
@@ -83,91 +76,55 @@
             border-radius: 6px;
             padding: 20px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            transition: transform 0.1s ease;
         }
 
-        .news-card:hover {
-            transform: translateY(-2px);
-        }
+        .news-title { margin: 0 0 10px 0; font-size: 18px; color: var(--primary-color); }
+        .news-date { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+        .news-summary { font-size: 14px; line-height: 1.6; margin-bottom: 15px; color: #4a5568; }
+        .news-link { color: var(--secondary-color); font-weight: bold; text-decoration: none; font-size: 14px; }
+        .news-link:hover { text-decoration: underline; }
 
-        .news-title {
-            margin: 0 0 10px 0;
-            font-size: 18px;
-            color: var(--primary-color);
-        }
-
-        .news-date {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-        }
-
-        .news-summary {
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 15px;
-            color: #4a5568;
-        }
-
-        .news-link {
-            display: inline-block;
-            color: var(--secondary-color);
-            font-weight: bold;
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-        .news-link:hover {
-            text-decoration: underline;
-        }
-
-        .loading, .error-msg {
-            text-align: center;
-            padding: 40px;
-            font-size: 16px;
-            color: var(--text-muted);
-        }
+        .loading, .error-msg { text-align: center; padding: 40px; font-size: 16px; color: var(--text-muted); }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>🏛️ Bureau of Immigration - Media Monitoring Dashboard</h1>
+        <h1>🏛️ Bureau of Immigration - Media Monitoring</h1>
         <span id="last-updated" style="font-size: 13px; opacity: 0.9;"></span>
     </header>
 
     <div class="container">
         <div class="controls">
-            <span><strong>Scope:</strong> All PH TV, Broadsheet & Online News Sources</span>
+            <span><strong>Scope:</strong> Real-Time Philippine Immigration News</span>
             <button class="refresh-btn" onclick="loadNews()">Fetch Latest News</button>
         </div>
 
         <div id="news-container" class="news-grid">
-            <div class="loading">Fetching real-time PH immigration news... Please wait...</div>
+            <div class="loading">Fetching news... Please wait...</div>
         </div>
     </div>
 
     <script>
         async function loadNews() {
             const container = document.getElementById('news-container');
-            container.innerHTML = '<div class="loading">Searching all news networks... Please wait...</div>';
+            container.innerHTML = '<div class="loading">Searching PH news networks for latest immigration updates...</div>';
             
             const rssFeed = 'https://news.google.com/rss/search?q=' + encodeURIComponent('"Bureau of Immigration" OR "BI NAIA" OR "Immigration Philippines"') + '&hl=en-PH&gl=PH&ceid=PH:en';
             
-            // HTTPS Secure AllOrigins proxy with JSON parsing
-            const endpoint = `https://api.allorigins.win/get?url=${encodeURIComponent(rssFeed)}&_=${Date.now()}`;
+            // Reliable HTTPS Proxy for GitHub Pages
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssFeed)}&_=${Date.now()}`;
 
             try {
-                const response = await fetch(endpoint);
-                if (!response.ok) throw new Error('Network response was not ok');
-                
+                const response = await fetch(proxyUrl);
                 const data = await response.json();
+                
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(data.contents, "text/xml");
                 const items = xmlDoc.querySelectorAll("item");
 
                 if (!items || items.length === 0) {
-                    container.innerHTML = '<div class="error-msg">No recent news found. Click refresh to try again.</div>';
+                    container.innerHTML = '<div class="error-msg">No recent news found. Click "Fetch Latest News" to refresh.</div>';
                     return;
                 }
 
@@ -175,33 +132,29 @@
                 document.getElementById('last-updated').textContent = 'Last Updated: ' + new Date().toLocaleTimeString();
 
                 items.forEach((item, index) => {
-                    const title = item.querySelector("title")?.textContent || "Immigration Update";
+                    const title = item.querySelector("title")?.textContent || "No Title";
                     const link = item.querySelector("link")?.textContent || "#";
-                    const rawDate = item.querySelector("pubDate")?.textContent || "";
-                    const pubDate = rawDate ? new Date(rawDate) : new Date();
+                    const pubDateRaw = item.querySelector("pubDate")?.textContent || "";
+                    const pubDate = pubDateRaw ? new Date(pubDateRaw).toLocaleString() : "";
                     
-                    let rawDesc = item.querySelector("description")?.textContent || "";
-                    let cleanSummary = rawDesc.replace(/<[^>]*>?/gm, '').trim();
-                    if (cleanSummary.length > 250) {
-                        cleanSummary = cleanSummary.substring(0, 250) + '...';
-                    }
-
-                    const source = item.querySelector("source")?.textContent || "PH Media Outlet";
+                    let desc = item.querySelector("description")?.textContent || "";
+                    let cleanDesc = desc.replace(/<[^>]*>?/gm, '').trim();
+                    if (cleanDesc.length > 220) cleanDesc = cleanDesc.substring(0, 220) + '...';
 
                     const card = document.createElement('div');
                     card.className = 'news-card';
                     card.innerHTML = `
                         <h3 class="news-title">${index + 1}. ${title}</h3>
-                        <div class="news-date">📅 Published: ${pubDate.toLocaleString()} | Source: ${source}</div>
-                        <p class="news-summary">${cleanSummary || 'Click link below to read the full report on the source site.'}</p>
-                        <a href="${link}" target="_blank" rel="noopener noreferrer" class="news-link">Read full story &raquo;</a>
+                        <div class="news-date">📅 ${pubDate}</div>
+                        <p class="news-summary">${cleanDesc || 'Click the link below to read full story.'}</p>
+                        <a href="${link}" target="_blank" rel="noopener noreferrer" class="news-link">Read full story on news site &raquo;</a>
                     `;
                     container.appendChild(card);
                 });
 
             } catch (error) {
                 console.error(error);
-                container.innerHTML = '<div class="error-msg">Failed to load news due to browser restrictions. Please click "Fetch Latest News" to retry.</div>';
+                container.innerHTML = '<div class="error-msg">Error connecting to server. Please click "Fetch Latest News" again.</div>';
             }
         }
 
