@@ -5,9 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BI Media Monitoring Dashboard</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 0; }
-        header { background-color: #003366; color: white; padding: 20px; text-align: center; }
-        .container { max-width: 900px; margin: 30px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #003366;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 25px auto;
+            padding: 0 20px;
+        }
+
+        .action-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .main-btn {
+            background-color: #0066cc;
+            color: white;
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .main-btn:hover {
+            background-color: #004999;
+        }
+
+        .feed-frame {
+            width: 100%;
+            height: 650px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: white;
+        }
     </style>
 </head>
 <body>
@@ -17,11 +72,22 @@
     </header>
 
     <div class="container">
-        <h3>Live Philippine News Coverage</h3>
-        <p style="color: #666; font-size: 14px;">Real-time coverage across GMA, ABS-CBN, Inquirer, Philstar, TV5, and broadsheets.</p>
         
-        <script async src="https://cse.google.com/cse.js?cx=b0e77469a473e4a98"></script>
-        <div class="gcse-searchresults-only" data-gss="1" data-queryParameterName="q" defaultToQuery='"Bureau of Immigration" OR "BI NAIA" OR "Immigration Philippines"'></div>
+        <!-- Single Central Button -->
+        <div class="action-box">
+            <p style="margin-top: 0; color: #444; font-size: 14px;">I-click ang button sa ibaba para buksan ang direktang live news portal ng BI sa panibagong tab:</p>
+            <a href="https://news.google.com/search?q=%22Bureau%20of%20Immigration%22%20OR%20%22BI%20NAIA%22&hl=en-PH&gl=PH&ceid=PH%3Aen" target="_blank" class="main-btn">
+                🔍 Buksan ang Live BI News (All Networks)
+            </a>
+        </div>
+
+        <!-- Embedded Live Feed Window -->
+        <iframe 
+            class="feed-frame" 
+            src="https://news.google.com/search?q=%22Bureau%20of%20Immigration%22%20OR%20%22BI%20NAIA%22&hl=en-PH&gl=PH&ceid=PH%3Aen" 
+            frameborder="0">
+        </iframe>
+
     </div>
 
 </body>
