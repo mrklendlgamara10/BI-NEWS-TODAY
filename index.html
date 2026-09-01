@@ -10,58 +10,73 @@
             background-color: #f4f6f9;
             margin: 0;
             padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         header {
             background-color: #003366;
             color: white;
-            padding: 20px;
+            padding: 25px 20px;
             text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
         }
 
         header h1 {
             margin: 0;
-            font-size: 20px;
+            font-size: 22px;
+            font-weight: 600;
         }
 
         .container {
-            max-width: 900px;
-            margin: 25px auto;
+            max-width: 600px;
+            margin: 60px auto;
             padding: 0 20px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        .action-box {
+        .main-card {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
+            padding: 40px 30px;
+            border-radius: 12px;
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e1e8ed;
         }
 
-        .main-btn {
+        .main-card h2 {
+            margin-top: 0;
+            color: #003366;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .main-card p {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+
+        .action-btn {
             background-color: #0066cc;
             color: white;
-            padding: 12px 24px;
-            font-size: 15px;
+            padding: 16px 32px;
+            font-size: 16px;
             font-weight: bold;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
+            box-shadow: 0 3px 6px rgba(0,102,204,0.3);
+            transition: background 0.2s ease;
         }
 
-        .main-btn:hover {
+        .action-btn:hover {
             background-color: #004999;
-        }
-
-        .feed-frame {
-            width: 100%;
-            height: 650px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background: white;
         }
     </style>
 </head>
@@ -72,22 +87,14 @@
     </header>
 
     <div class="container">
-        
-        <!-- Single Central Button -->
-        <div class="action-box">
-            <p style="margin-top: 0; color: #444; font-size: 14px;">I-click ang button sa ibaba para buksan ang direktang live news portal ng BI sa panibagong tab:</p>
-            <a href="https://news.google.com/search?q=%22Bureau%20of%20Immigration%22%20OR%20%22BI%20NAIA%22&hl=en-PH&gl=PH&ceid=PH%3Aen" target="_blank" class="main-btn">
-                🔍 Buksan ang Live BI News (All Networks)
+        <div class="main-card">
+            <h2>Real-Time PH Media Aggregator</h2>
+            <p>I-click ang button sa ibaba para buksan ang live news monitoring para sa Bureau of Immigration mula sa lahat ng TV networks at broadsheets (GMA, ABS-CBN, Inquirer, Philstar, TV5, etc.):</p>
+            
+            <a href="https://news.google.com/search?q=%22Bureau%20of%20Immigration%22%20OR%20%22BI%20NAIA%22%20OR%20%22Immigration%20Philippines%22&hl=en-PH&gl=PH&ceid=PH%3Aen" target="_blank" class="action-btn">
+                🔍 OPEN LIVE BI NEWS FEED
             </a>
         </div>
-
-        <!-- Embedded Live Feed Window -->
-        <iframe 
-            class="feed-frame" 
-            src="https://news.google.com/search?q=%22Bureau%20of%20Immigration%22%20OR%20%22BI%20NAIA%22&hl=en-PH&gl=PH&ceid=PH%3Aen" 
-            frameborder="0">
-        </iframe>
-
     </div>
 
 </body>
