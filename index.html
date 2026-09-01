@@ -151,8 +151,8 @@
 
     <div class="container">
         <div class="controls">
-            <span><strong>Source:</strong> Major PH TV Networks & Broadsheets</span>
-            <button class="refresh-btn" onclick="fetchNewsFeed()">🔄 Refresh Feed</button>
+            <span><strong>Scope:</strong> Bureau of Immigration Real-Time News</span>
+            <button class="refresh-btn" onclick="loadNews()">🔄 Refresh Feed</button>
         </div>
 
         <div id="news-container" class="news-list">
@@ -161,110 +161,71 @@
     </div>
 
     <script>
-        async function fetchNewsFeed() {
+        // Callback function triggered directly by Script Tag Injection (No Fetch / No CORS Redirect)
+        function renderNewsCards(data) {
             const container = document.getElementById('news-container');
-            container.innerHTML = '<div class="status-msg">Ina-update ang balita mula sa GMA, ABS-CBN, Inquirer, Philstar, atbp...</div>';
+
+            if (!data || data.status !== 'ok' || !data.items || data.items.length === 0) {
+                container.innerHTML = '<div class="status-msg">Walang nakuha na bagong balita sa ngayon. Paki-click ang Refresh Feed.</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            document.getElementById('last-updated').textContent = 'Last Updated: ' + new Date().toLocaleTimeString();
+
+            data.items.forEach((item, index) => {
+                const title = item.title || "Walang Pamagat";
+                const link = item.link || "#";
+                const pubDateRaw = item.pubDate || "";
+                const pubDate = pubDateRaw ? new Date(pubDateRaw).toLocaleString() : "Recently";
+                
+                let rawDesc = item.description || "";
+                let cleanSummary = rawDesc.replace(/<[^>]*>?/gm, '').trim();
+                if (cleanSummary.length > 220) {
+                    cleanSummary = cleanSummary.substring(0, 220) + '...';
+                }
+
+                const source = item.author || "PH Media Network";
+
+                const card = document.createElement('div');
+                card.className = 'news-card';
+                card.innerHTML = `
+                    <h3 class="news-title">${index + 1}. <a href="${link}" target="_blank" rel="noopener noreferrer">${title}</a></h3>
+                    <div class="news-meta">
+                        <span>📅 Published: ${pubDate}</span>
+                        <span>📰 Source: <strong>${source}</strong></span>
+                    </div>
+                    <p class="news-summary">${cleanSummary || 'I-click ang link sa ibaba para mabasa ang buong ulat sa orihinal na news site.'}</p>
+                    <a href="${link}" target="_blank" rel="noopener noreferrer" class="news-link-btn">Basahin ang buong balita sa source site &raquo;</a>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function loadNews() {
+            const container = document.getElementById('news-container');
+            container.innerHTML = '<div class="status-msg">Ina-update ang balita sa loob ng dashboard...</div>';
+
+            // Clean previous injected scripts
+            const oldScript = document.getElementById('jsonp-feed-script');
+            if (oldScript) oldScript.remove();
 
             const query = encodeURIComponent('"Bureau of Immigration" OR "BI NAIA" OR "Immigration Philippines"');
             const targetRss = `https://news.google.com/rss/search?q=${query}&hl=en-PH&gl=PH&ceid=PH:en`;
+
+            // Inject JSONP Script tag to bypass browser CORS completely
+            const script = document.createElement('script');
+            script.id = 'jsonp-feed-script';
+            script.src = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(targetRss)}&callback=renderNewsCards&_=${Date.now()}`;
             
-            // Reliable Serverless Parsing Endpoint
-            const apiUrl = `https://api.factmaven.com/xml-to-json/?xml=${encodeURIComponent(targetRss)}`;
+            script.onerror = function() {
+                container.innerHTML = '<div class="status-msg">Hindi maikonekta. Paki-pindot ang Refresh Feed button.</div>';
+            };
 
-            try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) throw new Error("Unable to fetch feed");
-                
-                const data = await response.json();
-                const items = data?.rss?.channel?.item;
-
-                if (!items || items.length === 0) {
-                    container.innerHTML = '<div class="status-msg">Walang nakuhang bagong balita sa kasalukuyan. Pindutin ang Refresh Feed.</div>';
-                    return;
-                }
-
-                container.innerHTML = '';
-                document.getElementById('last-updated').textContent = 'Last Updated: ' + new Date().toLocaleTimeString();
-
-                // Process list of news items
-                const newsList = Array.isArray(items) ? items : [items];
-
-                newsList.forEach((item, index) => {
-                    const title = item.title || "Walang Pamagat";
-                    const link = item.link || "#";
-                    const pubDateRaw = item.pubDate || "";
-                    const pubDate = pubDateRaw ? new Date(pubDateRaw).toLocaleString() : "Recently";
-                    
-                    let rawDesc = item.description || "";
-                    // Clean HTML tags from summary text
-                    let cleanSummary = rawDesc.replace(/<[^>]*>?/gm, '').trim();
-                    if (cleanSummary.length > 220) {
-                        cleanSummary = cleanSummary.substring(0, 220) + '...';
-                    }
-
-                    const source = item.source?.['#text'] || item.source || "PH Media Outlet";
-
-                    const card = document.createElement('div');
-                    card.className = 'news-card';
-                    card.innerHTML = `
-                        <h3 class="news-title">${index + 1}. <a href="${link}" target="_blank" rel="noopener noreferrer">${title}</a></h3>
-                        <div class="news-meta">
-                            <span>📅 ${pubDate}</span>
-                            <span>📰 Source: <strong>${source}</strong></span>
-                        </div>
-                        <p class="news-summary">${cleanSummary || 'I-click ang link sa ibaba para mabasa ang buong ulat sa opisyal na website.'}</p>
-                        <a href="${link}" target="_blank" rel="noopener noreferrer" class="news-link-btn">Basahin ang buong balita sa source site &raquo;</a>
-                    `;
-                    container.appendChild(card);
-                });
-
-            } catch (err) {
-                console.error(err);
-                // Fallback rendering structure using Google Feed API
-                fetchBackupFeed();
-            }
+            document.body.appendChild(script);
         }
 
-        async function fetchBackupFeed() {
-            const container = document.getElementById('news-container');
-            const query = encodeURIComponent('"Bureau of Immigration" OR "BI NAIA"');
-            const targetRss = `https://news.google.com/rss/search?q=${query}&hl=en-PH&gl=PH&ceid=PH:en`;
-            
-            try {
-                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(targetRss)}`);
-                const data = await res.json();
-                
-                if (data.status === 'ok' && data.items.length > 0) {
-                    container.innerHTML = '';
-                    document.getElementById('last-updated').textContent = 'Last Updated: ' + new Date().toLocaleTimeString();
-
-                    data.items.forEach((item, index) => {
-                        const pubDate = item.pubDate ? new Date(item.pubDate).toLocaleString() : "";
-                        let cleanDesc = item.description.replace(/<[^>]*>?/gm, '').trim();
-                        if (cleanDesc.length > 200) cleanDesc = cleanDesc.substring(0, 200) + '...';
-
-                        const card = document.createElement('div');
-                        card.className = 'news-card';
-                        card.innerHTML = `
-                            <h3 class="news-title">${index + 1}. <a href="${item.link}" target="_blank">${item.title}</a></h3>
-                            <div class="news-meta">
-                                <span>📅 ${pubDate}</span>
-                                <span>📰 Source: <strong>${item.author || 'News Outlet'}</strong></span>
-                            </div>
-                            <p class="news-summary">${cleanDesc}</p>
-                            <a href="${item.link}" target="_blank" class="news-link-btn">Basahin ang buong balita &raquo;</a>
-                        `;
-                        container.appendChild(card);
-                    });
-                } else {
-                    throw new Error("Backup failed");
-                }
-            } catch (e) {
-                container.innerHTML = '<div class="status-msg">Hindi maikonekta sa news server. Paki-pindot ang "Refresh Feed" button para sumubok muli.</div>';
-            }
-        }
-
-        window.onload = fetchNewsFeed;
+        window.onload = loadNews;
     </script>
 
 </body>
